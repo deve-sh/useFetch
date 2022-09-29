@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import { createContext } from "react";
 
 import GlobalCache from "../internals/GlobalCache";
 import GlobalFallback from "../internals/GlobalFallback";
@@ -9,10 +9,10 @@ const defaultProviderValue = {
 	isFetching: GlobalFetching,
 	fallback: GlobalFallback,
 	revalidateOnMount: true,
+	revalidateOnFocus: false,
 	dedupingInterval: 2000,
 	onSuccess: undefined,
 	onError: undefined,
-	revalidateOnFocus: false,
 };
 
 export interface FetchProviderArgs {
