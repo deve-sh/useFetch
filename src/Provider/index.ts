@@ -1,22 +1,9 @@
 import { createContext } from "react";
-
+import { defaultProviderValue } from "./DefaultGlobalProvider";
 import GlobalCache from "../internals/GlobalCache";
-import GlobalFallback from "../internals/GlobalFallback";
-import GlobalFetching from "../internals/GlobalFetching";
-
-const defaultProviderValue = {
-	cache: GlobalCache,
-	isFetching: GlobalFetching,
-	fallback: GlobalFallback,
-	revalidateOnMount: true,
-	revalidateOnFocus: false,
-	dedupingInterval: 2000,
-	onSuccess: undefined,
-	onError: undefined,
-};
 
 export interface FetchProviderArgs {
-	cache?: Map<string, any>;
+	cache?: typeof GlobalCache;
 	fallback?: { [key: string]: any };
 	fetcher?: (key: string) => Promise<any>;
 	revalidateOnMount?: boolean;
