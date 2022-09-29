@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
+import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
 
 interface useFetchOptions {
@@ -9,14 +10,21 @@ interface useFetchOptions {
 }
 
 const useFetch = (key: string, options: useFetchOptions) => {
+	const wrappedContext = useFetchContext();
 	const fallbackData =
-		options.fallbackData || useFetchContext().fallback?.[key] || undefined;
+		options.fallbackData || wrappedContext?.fallback?.[key] || undefined;
 	const fetcher =
-		options.fetcher || useFetchContext().fetcher || (async () => undefined);
+		options.fetcher || wrappedContext?.fetcher || globalProvider.fetcher;
 	const revalidateOnMount =
-		options.revalidateOnMount || useFetchContext().revalidateOnMount || true;
+		options.revalidateOnMount ||
+		wrappedContext?.revalidateOnMount ||
+		globalProvider.revalidateOnMount;
 	const revalidateOnFocus =
-		options.revalidateOnFocus || useFetchContext().revalidateOnFocus || true;
+		options.revalidateOnFocus ||
+		wrappedContext?.revalidateOnFocus ||
+		globalProvider.revalidateOnFocus;
+
+	const { setEntry } = wrappedContext?.cache || globalProvider?.cache;
 
 	const [data, setData] = useState(fallbackData);
 	const [error, setError] = useState(undefined);

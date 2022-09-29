@@ -1,7 +1,10 @@
-import { createContext, PropsWithChildren } from "react";
+import { createContext, PropsWithChildren, useMemo } from "react";
 import { defaultProviderValue } from "./DefaultGlobalProvider";
 
 import GlobalCache, { GlobalCacheType } from "../internals/GlobalCache";
+import GlobalFetching, {
+	GlobalFetchingType,
+} from "../internals/GlobalFetching";
 
 interface FetchProviderContextValue {
 	fallback?: { [key: string]: any };
@@ -14,7 +17,8 @@ interface FetchProviderContextValue {
 }
 
 export interface FetchProviderArgs extends FetchProviderContextValue {
-	cache?: GlobalCacheType;
+	cache: GlobalCacheType;
+	fetching: GlobalFetchingType;
 }
 
 export const FetchProviderContext =
@@ -25,8 +29,12 @@ interface FetchProviderProps extends PropsWithChildren {
 }
 
 const FetchProvider = ({ children, value }: FetchProviderProps) => {
+	const contextValue = useMemo(
+		() => ({ ...value, cache: GlobalCache, fetching: GlobalFetching }),
+		[value]
+	);
 	return (
-		<FetchProviderContext.Provider value={{ ...value, cache: GlobalCache }}>
+		<FetchProviderContext.Provider value={contextValue}>
 			{children}
 		</FetchProviderContext.Provider>
 	);
