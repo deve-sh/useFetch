@@ -1,11 +1,16 @@
 const Cache = new Map();
 
 type listenerFunctionType = (data: any) => any;
+export type GlobalCacheType = {
+	entries: Record<string, any> | Map<string, any>;
+	subscribers: Record<string, listenerFunctionType[]>;
+	subscribe: (key: string, listener: listenerFunctionType) => void;
+	unsubscribe: (key: string, listener: listenerFunctionType) => void;
+	setEntry: (key: string, value: any) => void;
+};
 
-const GlobalCache = (
-	CacheProvider: Record<string, any> | Map<string, any> = Cache
-) => ({
-	entries: CacheProvider,
+const GlobalCache: GlobalCacheType = {
+	entries: Cache,
 	// Listeners to Global Cache
 	subscribers: {} as Record<string, Array<listenerFunctionType>>,
 
@@ -31,6 +36,6 @@ const GlobalCache = (
 		// Send signal of update to subscribers for key.
 		for (const listenerFunc of this.subscribers[key] || []) listenerFunc(value);
 	},
-});
+};
 
 export default GlobalCache;
