@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useSyncExternalStore } from "react";
+import { useEffect, useCallback, useSyncExternalStore } from "react";
 import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
 
@@ -35,12 +35,17 @@ const useFetch = (key: string, options: useFetchOptions) => {
 		setFetching,
 		subscribe: subscribeToFetching,
 	} = wrappedContext?.fetching || globalProvider?.fetching;
+	const {
+		errors,
+		setError,
+		subscribe: subscribeToErrors,
+	} = wrappedContext?.errors || globalProvider?.errors;
 
 	const data = useSyncExternalStore(subscribe, () => overallDataCache.get(key));
 	const isValidating = useSyncExternalStore(subscribeToFetching, () =>
 		fetchingFor.get(key)
 	);
-	const [error, setError] = useState(undefined);
+	const error = useSyncExternalStore(subscribeToErrors, () => errors.get(key));
 
 	const fetchData = useCallback(async () => {
 		if (isValidating) {
@@ -54,11 +59,11 @@ const useFetch = (key: string, options: useFetchOptions) => {
 			.then((dataFetched) => {
 				setEntry(key, dataFetched);
 				setFetching(key, false);
-				setError(undefined);
+				setError(key, undefined);
 			})
 			.catch((err) => {
 				setEntry(key, undefined);
-				setError(err);
+				setError(key, err);
 				setFetching(key, false);
 			});
 	}, [key, isValidating]);

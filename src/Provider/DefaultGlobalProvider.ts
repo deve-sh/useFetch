@@ -1,4 +1,5 @@
 import GlobalCache from "../internals/GlobalCache";
+import GlobalErrors from "../internals/GlobalError";
 import GlobalFallback from "../internals/GlobalFallback";
 import GlobalFetching from "../internals/GlobalFetching";
 
@@ -7,6 +8,7 @@ import defaultFetcher from "./defaultFetcher";
 export const defaultProviderValue = {
 	cache: GlobalCache,
 	fetching: GlobalFetching,
+	errors: GlobalErrors,
 	fallback: GlobalFallback,
 	revalidateOnMount: true,
 	revalidateOnFocus: false,

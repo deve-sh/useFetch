@@ -5,6 +5,7 @@ import GlobalCache, { GlobalCacheType } from "../internals/GlobalCache";
 import GlobalFetching, {
 	GlobalFetchingType,
 } from "../internals/GlobalFetching";
+import GlobalErrors, { GlobalErrorsType } from "../internals/GlobalError";
 
 interface FetchProviderContextValue {
 	fallback?: { [key: string]: any };
@@ -19,6 +20,7 @@ interface FetchProviderContextValue {
 export interface FetchProviderArgs extends FetchProviderContextValue {
 	cache: GlobalCacheType;
 	fetching: GlobalFetchingType;
+	errors: GlobalErrorsType;
 }
 
 export const FetchProviderContext =
@@ -30,7 +32,12 @@ interface FetchProviderProps extends PropsWithChildren {
 
 const FetchProvider = ({ children, value }: FetchProviderProps) => {
 	const contextValue = useMemo(
-		() => ({ ...value, cache: GlobalCache, fetching: GlobalFetching }),
+		() => ({
+			...value,
+			cache: GlobalCache,
+			fetching: GlobalFetching,
+			errors: GlobalErrors,
+		}),
 		[value]
 	);
 	return (
