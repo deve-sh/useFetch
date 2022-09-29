@@ -6,7 +6,8 @@
 	"scripts": {
 		"compile": "tsc",
 		"bundle": "browserify ./dist/main.js --outfile ./dist/index.js --standalone useFetch",
-		"prepub": "node ./scripts/prepublish.js"
+		"prepub": "node ./scripts/prepublish.js",
+		"pub": "cd dist && npm run publish"
 	},
 	"keywords": [],
 	"author": "Devesh Kumar",
