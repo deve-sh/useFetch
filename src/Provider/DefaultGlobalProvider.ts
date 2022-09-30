@@ -16,10 +16,7 @@ export const defaultProviderValue = {
 	onSuccess: undefined,
 	onError: undefined,
 	fetcher: async function (key: string) {
-		return defaultFetcher(key).then((data) => {
-			this.cache.setEntry(key, data);
-			return data;
-		});
+		return defaultFetcher(key);
 	},
 };
 
