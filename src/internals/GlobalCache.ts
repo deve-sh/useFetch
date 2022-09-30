@@ -1,38 +1,36 @@
-const Cache = new Map();
-
 type listenerFunctionType = (data: any) => any;
 export type GlobalCacheType = {
-	entries: Map<string, any>;
-	subscribers: Set<listenerFunctionType>;
 	subscribe: (listener: listenerFunctionType) => () => void;
-	unsubscribe: (listener: listenerFunctionType) => void;
 	setEntry: (key: string, value: any) => void;
 	getEntries: () => Map<string, any>;
+	entries: Map<string, any>;
 };
 
-const GlobalCache: GlobalCacheType = {
-	entries: Cache,
-	// Listeners to Global Cache
-	subscribers: new Set(),
+const cache = new Map();
+const cacheSubscribers: Set<listenerFunctionType> = new Set();
+const unsubscriber = (listener: listenerFunctionType) =>
+	cacheSubscribers.delete(listener);
 
+const GlobalCache: GlobalCacheType = {
 	// Subscription setters and getters
-	subscribe: function (listener: listenerFunctionType) {
+	subscribe(listener: listenerFunctionType) {
 		// Check if listener is already subscribed.
-		this.subscribers.add(listener);
-		return () => this.unsubscribe(listener);
+		cacheSubscribers.add(listener);
+		return () => unsubscriber(listener);
 	},
-	unsubscribe: function (listener: listenerFunctionType) {
-		this.subscribers.delete(listener);
+
+	get entries() {
+		return cache;
 	},
 
 	// Cache updater
-	setEntry: function (key: string, value: any) {
-		this.entries.set(key, value);
+	setEntry(key: string, value: any) {
+		cache.set(key, value);
 		// Send signal of update to subscribers for key.
-		for (const listenerFunc of this.subscribers) listenerFunc(value);
+		cacheSubscribers.forEach((listenerFunc) => listenerFunc(cache));
 	},
-	getEntries: function () {
-		return this.entries;
+	getEntries() {
+		return cache;
 	},
 };
 

@@ -1,40 +1,37 @@
-const Errors = new Map();
-
 type listenerFunctionType = (data: Error | any) => any;
 
 export type GlobalErrorsType = {
 	errors: Map<string, Error | undefined>;
-	subscribers: Set<listenerFunctionType>;
 	subscribe: (listener: listenerFunctionType) => () => void;
-	unsubscribe: (listener: listenerFunctionType) => void;
 	setError: (key: string, error?: Error) => void;
 	getErrors: () => Map<string, Error | undefined>;
 };
 
+const Errors = new Map();
+const errorStatusSubscribers: Set<listenerFunctionType> = new Set();
+const unsubscriber = (listener: listenerFunctionType) =>
+	errorStatusSubscribers.delete(listener);
+
 const GlobalErrors: GlobalErrorsType = {
-	errors: Errors,
-
-	// Listeners to Global errors
-	subscribers: new Set(),
-
 	// Subscription setters and getters
 	subscribe: function (listener: listenerFunctionType) {
 		// Check if listener is already subscribed.
-		this.subscribers.add(listener);
-		return () => this.unsubscribe(listener);
-	},
-	unsubscribe: function (listener: listenerFunctionType) {
-		this.subscribers.delete(listener);
+		console.log(this);
+		errorStatusSubscribers.add(listener);
+		return () => unsubscriber(listener);
 	},
 
 	// errors updater
 	setError: function (key: string, error?: Error) {
-		this.errors.set(key, error);
+		Errors.set(key, error);
 		// Send signal of update to subscribers for key.
-		for (const listenerFunc of this.subscribers) listenerFunc(error);
+		errorStatusSubscribers.forEach((listenerFunc) => listenerFunc(error));
+	},
+	get errors() {
+		return Errors;
 	},
 	getErrors: function () {
-		return this.errors;
+		return Errors;
 	},
 };
 

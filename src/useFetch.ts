@@ -9,7 +9,7 @@ interface useFetchOptions {
 	fetcher?: (key: string) => Promise<any>;
 }
 
-const useFetch = (key: string, options: useFetchOptions) => {
+const useFetch = (key: string, options: useFetchOptions = {}) => {
 	const wrappedContext = useFetchContext();
 
 	const fallbackData =
@@ -66,11 +66,11 @@ const useFetch = (key: string, options: useFetchOptions) => {
 				setError(key, err);
 				setFetching(key, false);
 			});
-	}, [key, isValidating]);
+	}, [key, isValidating, fetcher, setEntry, setError, setFetching]);
 
 	useEffect(() => {
 		if (revalidateOnMount) fetchData();
-	}, []);
+	}, [revalidateOnMount, fetchData]);
 
 	const revalidate = useCallback(
 		async (
@@ -87,10 +87,15 @@ const useFetch = (key: string, options: useFetchOptions) => {
 				if (revalidateAfterSetting) fetchData();
 			} else fetchData();
 		},
-		[fetchData]
+		[fetchData, key, setEntry]
 	);
 
-	return { data: data || fallbackData, revalidate, isValidating, error };
+	return {
+		data: typeof data === "undefined" ? fallbackData || undefined : data,
+		revalidate,
+		isValidating,
+		error,
+	};
 };
 
 export default useFetch;
