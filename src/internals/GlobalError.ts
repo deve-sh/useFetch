@@ -16,7 +16,6 @@ const GlobalErrors: GlobalErrorsType = {
 	// Subscription setters and getters
 	subscribe: function (listener: listenerFunctionType) {
 		// Check if listener is already subscribed.
-		console.log(this);
 		errorStatusSubscribers.add(listener);
 		return () => unsubscriber(listener);
 	},
