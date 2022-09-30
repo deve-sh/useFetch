@@ -9,6 +9,7 @@ interface useFetchOptions {
 	revalidateOnFocus?: boolean;
 	fallbackData?: any;
 	fetcher?: (key: string) => Promise<any>;
+	dedupingInterval?: number;
 }
 
 const useFetch = (key: string, options: useFetchOptions = {}) => {
@@ -35,6 +36,12 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 		wrappedContext?.revalidateOnFocus,
 		globalProvider.revalidateOnFocus
 	);
+	const dedupingInterval = resolveIfNotUndefined(
+		options.dedupingInterval,
+		wrappedContext?.dedupingInterval,
+		globalProvider.dedupingInterval,
+		2000
+	);
 
 	const {
 		setEntry,
@@ -52,14 +59,15 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 		subscribe: subscribeToErrors,
 	} = wrappedContext?.errors || globalProvider?.errors;
 
+	// Sync hook with cache for the data.
 	const data = useSyncExternalStore(subscribe, () => overallDataCache.get(key));
-	const isValidating = useSyncExternalStore(subscribeToFetching, () =>
-		fetchingFor.get(key)
-	);
-	const error = useSyncExternalStore(subscribeToErrors, () => errors.get(key));
+	// Sync hook for validating and error updates as well
+	useSyncExternalStore(subscribeToFetching, () => fetchingFor.get(key));
+	useSyncExternalStore(subscribeToErrors, () => errors.get(key));
 
 	const fetchData = async () => {
-		if (isValidating) {
+		const isCurrentlyFetching = fetchingFor.get(key);
+		if (isCurrentlyFetching) {
 			// Already being fethed somewhere else.
 			// That hook will make the request, get the data and populate the global cache.
 			// Which will reflect here.
@@ -107,8 +115,8 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 				? fallbackData
 				: data,
 		revalidate,
-		isValidating: isValidating || false,
-		error,
+		isValidating: fetchingFor.get(key) || false,
+		error: errors.get(key) || undefined,
 	};
 };
 
