@@ -119,12 +119,12 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 			if (typeof updater === "function") {
 				const updatedData = await updater();
 				setEntry(key, updatedData);
-				if (revalidateAfterSetting) fetchData();
+				if (revalidateAfterSetting) fetchData(true);
 				return updatedData;
 			} else if (typeof updater !== "undefined") {
 				setEntry(key, updater);
-				if (revalidateAfterSetting) fetchData();
-			} else fetchData();
+				if (revalidateAfterSetting) fetchData(true);
+			} else fetchData(true);
 		},
 		[fetchData, key]
 	);
