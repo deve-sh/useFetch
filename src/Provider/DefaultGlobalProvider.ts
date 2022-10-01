@@ -3,6 +3,7 @@ import GlobalErrors from "../internals/GlobalErrors";
 import GlobalFallback from "../internals/GlobalFallback";
 import GlobalFetching from "../internals/GlobalFetching";
 import GlobalLastFetched from "../internals/GlobalLastFetched";
+import GlobalRevalidatorMap from "../internals/GlobalRevalidatorMap";
 
 import defaultFetcher from "./defaultFetcher";
 
@@ -11,6 +12,7 @@ export const defaultProviderValue = {
 	fetching: GlobalFetching(),
 	errors: GlobalErrors(),
 	lastFetched: GlobalLastFetched(),
+	revalidators: GlobalRevalidatorMap(),
 	fallback: GlobalFallback,
 	revalidateOnMount: true,
 	revalidateOnFocus: false,
