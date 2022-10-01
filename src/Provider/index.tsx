@@ -6,6 +6,9 @@ import GlobalFetching, {
 	GlobalFetchingType,
 } from "../internals/GlobalFetching";
 import GlobalErrors, { GlobalErrorsType } from "../internals/GlobalErrors";
+import GlobalLastFetched, {
+	GlobalLastFetchedType,
+} from "../internals/GlobalLastFetched";
 
 interface FetchProviderContextValue {
 	fallback?: { [key: string]: any };
@@ -21,6 +24,7 @@ export interface FetchProviderArgs extends FetchProviderContextValue {
 	cache: GlobalCacheType;
 	fetching: GlobalFetchingType;
 	errors: GlobalErrorsType;
+	lastFetched: GlobalLastFetchedType;
 }
 
 export const FetchProviderContext =
@@ -37,6 +41,7 @@ const FetchProvider = ({ children, value }: FetchProviderProps) => {
 			cache: GlobalCache(),
 			fetching: GlobalFetching(),
 			errors: GlobalErrors(),
+			lastFetched: GlobalLastFetched(),
 		}),
 		[value]
 	);
