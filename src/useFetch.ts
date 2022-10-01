@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useSyncExternalStore } from "react";
 import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
+import type Revalidator from "./singleTypes/Revalidator";
 
 import resolveIfNotUndefined from "./utils/resolveIfNotUndefined";
 
@@ -15,31 +16,29 @@ interface useFetchOptions {
 const useFetch = (key: string, options: useFetchOptions = {}) => {
 	const wrappedContext = useFetchContext();
 
+	const contextToReferTo = wrappedContext || globalProvider;
+
 	const fallbackData = resolveIfNotUndefined(
 		options.fallbackData,
-		wrappedContext?.fallback?.[key],
+		contextToReferTo.fallback?.[key],
 		undefined
 	);
 	const fetcher = resolveIfNotUndefined(
 		options.fetcher,
-		wrappedContext?.fetcher,
-		globalProvider.fetcher
+		contextToReferTo.fetcher
 	);
 
 	const revalidateOnMount = resolveIfNotUndefined(
 		options.revalidateOnMount,
-		wrappedContext?.revalidateOnMount,
-		globalProvider.revalidateOnMount
+		contextToReferTo.revalidateOnMount
 	);
 	const revalidateOnFocus = resolveIfNotUndefined(
 		options.revalidateOnFocus,
-		wrappedContext?.revalidateOnFocus,
-		globalProvider.revalidateOnFocus
+		contextToReferTo.revalidateOnFocus
 	);
 	const dedupingInterval = resolveIfNotUndefined(
 		options.dedupingInterval,
-		wrappedContext?.dedupingInterval,
-		globalProvider.dedupingInterval,
+		contextToReferTo.dedupingInterval,
 		2000
 	);
 
@@ -47,18 +46,18 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 		setEntry,
 		entries: overallDataCache,
 		subscribe: subscribeToCache,
-	} = wrappedContext?.cache || globalProvider.cache;
+	} = contextToReferTo.cache;
 	const {
 		entries: fetchingFor,
 		setFetching,
 		subscribe: subscribeToFetching,
-	} = wrappedContext?.fetching || globalProvider.fetching;
+	} = contextToReferTo.fetching;
 	const {
 		errors,
 		setError,
 		subscribe: subscribeToErrors,
-	} = wrappedContext?.errors || globalProvider.errors;
-	const lastFetched = wrappedContext?.lastFetched || globalProvider.lastFetched;
+	} = contextToReferTo.errors;
+	const { lastFetched } = contextToReferTo;
 
 	// Sync hook with cache for the data.
 	const data = useSyncExternalStore(subscribeToCache, () =>
@@ -111,7 +110,7 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 		if (revalidateOnMount) fetchData();
 	}, [revalidateOnMount]);
 
-	const revalidate = useCallback(
+	const revalidate: Revalidator = useCallback(
 		async (
 			updater?: () => Promise<any> | any,
 			revalidateAfterSetting?: boolean
@@ -128,6 +127,15 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 		},
 		[fetchData, key]
 	);
+
+	useEffect(() => {
+		if (contextToReferTo.revalidators.get(key)) return; // Already set revalidator for this key in the global context.
+
+		contextToReferTo.revalidators.set(key, revalidate);
+		return () => {
+			contextToReferTo.revalidators.set(key, undefined);
+		};
+	}, [revalidate]);
 
 	return {
 		data:

@@ -9,8 +9,11 @@ import GlobalErrors, { GlobalErrorsType } from "../internals/GlobalErrors";
 import GlobalLastFetched, {
 	GlobalLastFetchedType,
 } from "../internals/GlobalLastFetched";
+import GlobalRevalidatorMap, {
+	GlobalRevalidatorMapType,
+} from "../internals/GlobalRevalidatorMap";
 
-interface FetchProviderContextValue {
+export interface FetchProviderContextValue {
 	fallback?: { [key: string]: any };
 	fetcher?: (key: string) => Promise<any>;
 	revalidateOnMount?: boolean;
@@ -20,15 +23,16 @@ interface FetchProviderContextValue {
 	onError?: (err: Error, key: string, config: Record<string, any>) => any;
 }
 
-export interface FetchProviderArgs extends FetchProviderContextValue {
+export interface FetchProviderProperties extends FetchProviderContextValue {
 	cache: GlobalCacheType;
 	fetching: GlobalFetchingType;
 	errors: GlobalErrorsType;
 	lastFetched: GlobalLastFetchedType;
+	revalidators: GlobalRevalidatorMapType;
 }
 
 export const FetchProviderContext =
-	createContext<FetchProviderArgs>(defaultProviderValue);
+	createContext<FetchProviderProperties>(defaultProviderValue);
 
 interface FetchProviderProps extends PropsWithChildren {
 	value: FetchProviderContextValue;
@@ -42,6 +46,7 @@ const FetchProvider = ({ children, value }: FetchProviderProps) => {
 			fetching: GlobalFetching(),
 			errors: GlobalErrors(),
 			lastFetched: GlobalLastFetched(),
+			revalidators: GlobalRevalidatorMap(),
 		}),
 		[value]
 	);
