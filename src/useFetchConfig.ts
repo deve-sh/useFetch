@@ -21,6 +21,8 @@ const useFetchConfig = () => {
 		fallback: contextToReferTo.fallback,
 		cache: contextToReferTo.cache.entries,
 		dedupingInterval: contextToReferTo.dedupingInterval,
+		revalidateOnMount: contextToReferTo.revalidateOnMount,
+		revalidateOnFocus: contextToReferTo.revalidateOnFocus,
 	};
 };
 

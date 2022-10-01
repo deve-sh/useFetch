@@ -129,8 +129,6 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 	);
 
 	useEffect(() => {
-		if (contextToReferTo.revalidators.get(key)) return; // Already set revalidator for this key in the global context.
-
 		contextToReferTo.revalidators.set(key, revalidate);
 		return () => {
 			contextToReferTo.revalidators.set(key, undefined);
