@@ -46,39 +46,59 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 	const {
 		setEntry,
 		entries: overallDataCache,
-		subscribe,
-	} = wrappedContext?.cache || globalProvider?.cache;
+		subscribe: subscribeToCache,
+	} = wrappedContext?.cache || globalProvider.cache;
 	const {
 		entries: fetchingFor,
 		setFetching,
 		subscribe: subscribeToFetching,
-	} = wrappedContext?.fetching || globalProvider?.fetching;
+	} = wrappedContext?.fetching || globalProvider.fetching;
 	const {
 		errors,
 		setError,
 		subscribe: subscribeToErrors,
-	} = wrappedContext?.errors || globalProvider?.errors;
+	} = wrappedContext?.errors || globalProvider.errors;
+	const lastFetched = wrappedContext?.lastFetched || globalProvider.lastFetched;
 
 	// Sync hook with cache for the data.
-	const data = useSyncExternalStore(subscribe, () => overallDataCache.get(key));
+	const data = useSyncExternalStore(subscribeToCache, () =>
+		overallDataCache.get(key)
+	);
 	// Sync hook for validating and error updates as well
 	useSyncExternalStore(subscribeToFetching, () => fetchingFor.get(key));
 	useSyncExternalStore(subscribeToErrors, () => errors.get(key));
 
-	const fetchData = async () => {
+	const setLastFetched = () => lastFetched.set(key, new Date().getTime());
+
+	const allowedToFetchData = (isFromRevalidate = false) => {
 		const isCurrentlyFetching = fetchingFor.get(key);
 		if (isCurrentlyFetching) {
 			// Already being fethed somewhere else.
 			// That hook will make the request, get the data and populate the global cache.
 			// Which will reflect here.
-			return;
+			return false;
 		}
+
+		// Check for deduping interval.
+		if (isFromRevalidate) {
+			// If the invocation is from revalidate, always let it go through.
+			const lastFetchedForKey = lastFetched.get(key);
+			const now = new Date().getTime();
+			if (lastFetchedForKey && now - lastFetchedForKey < dedupingInterval)
+				return false;
+		}
+		return true;
+	};
+
+	const fetchData = async (isFromRevalidate = false) => {
+		if (!allowedToFetchData(isFromRevalidate)) return;
 		setFetching(key, true);
 		fetcher(key)
 			.then((dataFetched: any) => {
 				setEntry(key, dataFetched);
 				setFetching(key, false);
 				setError(key, undefined);
+				setLastFetched();
 			})
 			.catch((err: Error) => {
 				setEntry(key, undefined);
