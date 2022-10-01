@@ -1,6 +1,8 @@
 import { useEffect, useCallback, useSyncExternalStore } from "react";
 import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
+
+import type FetchKey from "./singleTypes/Fetchkey";
 import type Revalidator from "./singleTypes/Revalidator";
 
 import resolveIfNotUndefined from "./utils/resolveIfNotUndefined";
@@ -13,14 +15,16 @@ interface useFetchOptions {
 	dedupingInterval?: number;
 }
 
-const useFetch = (key: string, options: useFetchOptions = {}) => {
+const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 	const wrappedContext = useFetchContext();
 
 	const contextToReferTo = wrappedContext || globalProvider;
 
+	const isKeyFetchable = key !== null;
+
 	const fallbackData = resolveIfNotUndefined(
 		options.fallbackData,
-		contextToReferTo.fallback?.[key],
+		isKeyFetchable ? contextToReferTo.fallback?.[key] : undefined,
 		undefined
 	);
 	const fetcher = resolveIfNotUndefined(
@@ -60,16 +64,25 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 	const { lastFetched } = contextToReferTo;
 
 	// Sync hook with cache for the data.
-	const data = useSyncExternalStore(subscribeToCache, () =>
-		overallDataCache.get(key)
+	const data = useSyncExternalStore(
+		subscribeToCache,
+		isKeyFetchable ? () => overallDataCache.get(key) : () => null
 	);
 	// Sync hook for validating and error updates as well
-	useSyncExternalStore(subscribeToFetching, () => fetchingFor.get(key));
-	useSyncExternalStore(subscribeToErrors, () => errors.get(key));
+	useSyncExternalStore(subscribeToFetching, () =>
+		isKeyFetchable ? fetchingFor.get(key) : () => null
+	);
+	useSyncExternalStore(subscribeToErrors, () =>
+		isKeyFetchable ? errors.get(key) : () => null
+	);
 
-	const setLastFetched = () => lastFetched.set(key, new Date().getTime());
+	const setLastFetched = () => {
+		if (isKeyFetchable) lastFetched.set(key, new Date().getTime());
+	};
 
 	const allowedToFetchData = (isFromRevalidate = false) => {
+		if (!isKeyFetchable) return false;
+
 		const isCurrentlyFetching = fetchingFor.get(key);
 		if (isCurrentlyFetching) {
 			// Already being fethed somewhere else.
@@ -90,7 +103,7 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 	};
 
 	const fetchData = async (isFromRevalidate = false) => {
-		if (!allowedToFetchData(isFromRevalidate)) return;
+		if (!allowedToFetchData(isFromRevalidate) || !isKeyFetchable) return;
 		setFetching(key, true);
 		fetcher(key)
 			.then((dataFetched: any) => {
@@ -115,6 +128,8 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 			updater?: () => Promise<any> | any,
 			revalidateAfterSetting?: boolean
 		) => {
+			if (!isKeyFetchable) return;
+
 			if (typeof updater === "function") {
 				const updatedData = await updater();
 				setEntry(key, updatedData);
@@ -129,6 +144,7 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 	);
 
 	useEffect(() => {
+		if (!isKeyFetchable) return;
 		contextToReferTo.revalidators.set(key, revalidate);
 		return () => {
 			contextToReferTo.revalidators.set(key, undefined);
@@ -141,8 +157,8 @@ const useFetch = (key: string, options: useFetchOptions = {}) => {
 				? fallbackData
 				: data,
 		revalidate,
-		isValidating: fetchingFor.get(key) || false,
-		error: errors.get(key) || undefined,
+		isValidating: isKeyFetchable ? fetchingFor.get(key) || false : false,
+		error: isKeyFetchable ? errors.get(key) || undefined : undefined,
 	};
 };
 
