@@ -2,6 +2,7 @@ import GlobalCache from "../internals/GlobalCache";
 import GlobalErrors from "../internals/GlobalErrors";
 import GlobalFallback from "../internals/GlobalFallback";
 import GlobalFetching from "../internals/GlobalFetching";
+import GlobalFocusRevalidationEventSet from "../internals/GlobalFocusRevalidationEventSet";
 import GlobalLastFetched from "../internals/GlobalLastFetched";
 import GlobalRevalidatorMap from "../internals/GlobalRevalidatorMap";
 
@@ -13,6 +14,7 @@ export const defaultProviderValue = {
 	errors: GlobalErrors(),
 	lastFetched: GlobalLastFetched(),
 	revalidators: GlobalRevalidatorMap(),
+	revalidateOnFocusEventSetFor: GlobalFocusRevalidationEventSet(),
 	fallback: GlobalFallback,
 	revalidateOnMount: true,
 	revalidateOnFocus: false,
