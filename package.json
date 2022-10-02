@@ -17,9 +17,12 @@
 	},
 	"devDependencies": {
 		"@types/react": "^18.0.21",
+		"@types/use-sync-external-store": "0.0.3",
 		"browserify": "^17.0.0",
 		"react": "^18.2.0",
 		"typescript": "^4.8.4"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"use-sync-external-store": "^1.2.0"
+	}
 }
