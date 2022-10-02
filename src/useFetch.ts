@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useSyncExternalStore } from "react";
+import { useEffect, useCallback, useMemo } from "react";
+import { useSyncExternalStore } from "use-sync-external-store/shim";
 import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
 
@@ -13,6 +14,8 @@ interface useFetchOptions {
 	fallbackData?: any;
 	fetcher?: (key: string) => Promise<any>;
 	dedupingInterval?: number;
+	onSuccess?: (data: any, key: FetchKey, config: useFetchOptions) => any;
+	onError?: (error: Error, key: FetchKey, config: useFetchOptions) => any;
 }
 
 const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
@@ -22,6 +25,13 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 
 	const isKeyFetchable = key !== null;
 
+	const { onSuccess, onError } = useMemo(
+		() => ({
+			onSuccess: options.onSuccess,
+			onError: options.onError,
+		}),
+		[options]
+	);
 	const fallbackData = resolveIfNotUndefined(
 		options.fallbackData,
 		isKeyFetchable ? contextToReferTo.fallback?.[key] : undefined,
@@ -69,11 +79,11 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 		isKeyFetchable ? () => overallDataCache.get(key) : () => null
 	);
 	// Sync hook for validating and error updates as well
+	const error = useSyncExternalStore(subscribeToErrors, () =>
+		isKeyFetchable ? errors.get(key) : () => null
+	);
 	useSyncExternalStore(subscribeToFetching, () =>
 		isKeyFetchable ? fetchingFor.get(key) : () => null
-	);
-	useSyncExternalStore(subscribeToErrors, () =>
-		isKeyFetchable ? errors.get(key) : () => null
 	);
 
 	const setLastFetched = () => {
@@ -142,6 +152,16 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 		},
 		[fetchData, key]
 	);
+
+	useEffect(() => {
+		if (data !== undefined && typeof onSuccess === "function")
+			onSuccess(data, key, options);
+	}, [data]);
+
+	useEffect(() => {
+		if (error !== undefined && typeof onError === "function")
+			onError(error as Error, key, options);
+	}, [error]);
 
 	useEffect(() => {
 		if (!isKeyFetchable) return;
