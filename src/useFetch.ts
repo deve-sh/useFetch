@@ -2,7 +2,7 @@ import { useEffect, useCallback, useSyncExternalStore } from "react";
 import globalProvider from "./Provider/DefaultGlobalProvider";
 import { useFetchContext } from "./Provider/useFetchContext";
 
-import type FetchKey from "./singleTypes/Fetchkey";
+import type FetchKey from "./singleTypes/FetchKey";
 import type Revalidator from "./singleTypes/Revalidator";
 
 import resolveIfNotUndefined from "./utils/resolveIfNotUndefined";
