@@ -57,7 +57,7 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 	);
 
 	const {
-		setEntry,
+		setEntry: setCacheEntry,
 		entries: overallDataCache,
 		subscribe: subscribeToCache,
 	} = contextToReferTo.cache;
@@ -117,13 +117,13 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 		setFetching(key, true);
 		fetcher(key)
 			.then((dataFetched: any) => {
-				setEntry(key, dataFetched);
+				setCacheEntry(key, dataFetched);
 				setFetching(key, false);
 				setError(key, undefined);
 				setLastFetched();
 			})
 			.catch((err: Error) => {
-				setEntry(key, undefined);
+				setCacheEntry(key, undefined);
 				setError(key, err);
 				setFetching(key, false);
 			});
@@ -142,11 +142,11 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 
 			if (typeof updater === "function") {
 				const updatedData = await updater();
-				setEntry(key, updatedData);
+				setCacheEntry(key, updatedData);
 				if (revalidateAfterSetting) fetchData(true);
 				return updatedData;
 			} else if (typeof updater !== "undefined") {
-				setEntry(key, updater);
+				setCacheEntry(key, updater);
 				if (revalidateAfterSetting) fetchData(true);
 			} else fetchData(true);
 		},
