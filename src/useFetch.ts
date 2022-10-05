@@ -74,16 +74,15 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 	const { lastFetched } = contextToReferTo;
 
 	// Sync hook with cache for the data.
-	const data = useSyncExternalStore(
-		subscribeToCache,
-		isKeyFetchable ? () => overallDataCache.get(key) : () => null
+	const data = useSyncExternalStore(subscribeToCache, () =>
+		isKeyFetchable ? overallDataCache.get(key) : null
 	);
 	// Sync hook for validating and error updates as well
 	const error = useSyncExternalStore(subscribeToErrors, () =>
-		isKeyFetchable ? errors.get(key) : () => null
+		isKeyFetchable ? errors.get(key) : null
 	);
 	useSyncExternalStore(subscribeToFetching, () =>
-		isKeyFetchable ? fetchingFor.get(key) : () => null
+		isKeyFetchable ? fetchingFor.get(key) : null
 	);
 
 	const setLastFetched = () => {
