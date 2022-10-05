@@ -33,7 +33,7 @@ describe("revalidateOnMount tests", () => {
 	it("should work with revalidateOnMount passed as false", () => {
 		render(<RevalidateOnMount />);
 		expect(getAPICallsList().length).toBe(0);
-		expect(getAPICallsList()[0]).toBe(undefined);
+		expect(getAPICallsList()[0]).toBeUndefined();
 		expect(getNTimesAPICallInvoked()).toBe(0);
 	});
 });
