@@ -1,6 +1,3 @@
-import useFetch from "./useFetch";
-import useFetchConfig from "./useFetchConfig";
-import FetchProvider from "./Provider";
-
-export default useFetch;
-export { useFetchConfig, FetchProvider };
+export { default as useFetchConfig } from "./useFetchConfig";
+export { default as FetchProvider } from "./Provider";
+export { default } from "./useFetch";
