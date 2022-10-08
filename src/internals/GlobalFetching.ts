@@ -4,7 +4,6 @@ export type GlobalFetchingType = {
 	entries: Map<string, boolean>;
 	subscribe: (listener: listenerFunctionType) => () => void;
 	setFetching: (key: string, fetching: boolean) => void;
-	getFetching: () => Map<string, boolean>;
 };
 
 const GlobalFetching = (): GlobalFetchingType => {
@@ -16,7 +15,6 @@ const GlobalFetching = (): GlobalFetchingType => {
 	return {
 		// Subscription setters and getters
 		subscribe: function (listener: listenerFunctionType) {
-			// Check if listener is already subscribed.
 			fetchingStatusSubscribers.add(listener);
 			return () => unsubscriber(listener);
 		},
@@ -30,9 +28,6 @@ const GlobalFetching = (): GlobalFetchingType => {
 			);
 		},
 		get entries() {
-			return Fetching;
-		},
-		getFetching: function () {
 			return Fetching;
 		},
 	};

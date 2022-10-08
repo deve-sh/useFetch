@@ -4,7 +4,6 @@ export type GlobalErrorsType = {
 	errors: Map<string, Error | undefined>;
 	subscribe: (listener: listenerFunctionType) => () => void;
 	setError: (key: string, error?: Error) => void;
-	getErrors: () => Map<string, Error | undefined>;
 };
 
 const GlobalErrors = (): GlobalErrorsType => {
@@ -14,9 +13,7 @@ const GlobalErrors = (): GlobalErrorsType => {
 		errorStatusSubscribers.delete(listener);
 
 	return {
-		// Subscription setters and getters
 		subscribe: function (listener: listenerFunctionType) {
-			// Check if listener is already subscribed.
 			errorStatusSubscribers.add(listener);
 			return () => unsubscriber(listener);
 		},
@@ -28,9 +25,6 @@ const GlobalErrors = (): GlobalErrorsType => {
 			errorStatusSubscribers.forEach((listenerFunc) => listenerFunc(error));
 		},
 		get errors() {
-			return Errors;
-		},
-		getErrors: function () {
 			return Errors;
 		},
 	};
