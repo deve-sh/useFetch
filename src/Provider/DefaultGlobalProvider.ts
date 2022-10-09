@@ -22,9 +22,7 @@ export const defaultProviderValue = {
 	dedupingInterval: 2000,
 	onSuccess: undefined,
 	onError: undefined,
-	fetcher: async function (key: string) {
-		return defaultFetcher(key);
-	},
+	fetcher: defaultFetcher,
 };
 
 export default defaultProviderValue;
