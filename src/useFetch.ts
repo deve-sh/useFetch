@@ -135,7 +135,7 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 	const revalidate: Revalidator = useCallback(
 		async (
 			updater?: () => Promise<any> | any,
-			revalidateAfterSetting?: boolean
+			revalidateAfterSetting: boolean = true
 		) => {
 			if (!isKeyFetchable) return;
 
