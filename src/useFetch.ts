@@ -32,11 +32,13 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 		}),
 		[options]
 	);
-	const fallbackData = resolveIfNotUndefined(
-		options.fallbackData,
-		isKeyFetchable ? contextToReferTo.fallback?.[key] : undefined,
-		undefined
-	);
+	const fallbackData = isKeyFetchable
+		? resolveIfNotUndefined(
+				options.fallbackData,
+				(contextToReferTo.fallback || {})[key],
+				undefined
+		  )
+		: undefined;
 	const fetcher = resolveIfNotUndefined(
 		options.fetcher,
 		contextToReferTo.fetcher
