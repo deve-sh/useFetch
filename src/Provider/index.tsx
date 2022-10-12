@@ -12,9 +12,7 @@ import GlobalLastFetched, {
 import GlobalRevalidatorMap, {
 	GlobalRevalidatorMapType,
 } from "../internals/GlobalRevalidatorMap";
-import GlobalFocusRevalidationEventSet, {
-	GlobalFocusRevalidationEventSetType,
-} from "../internals/GlobalFocusRevalidationEventSet";
+import { GlobalFocusRevalidationEventSetType } from "../internals/GlobalFocusRevalidationEventSet";
 
 export interface FetchProviderContextValue {
 	fallback?: { [key: string]: any };
@@ -32,7 +30,7 @@ export interface FetchProviderProperties extends FetchProviderContextValue {
 	errors: GlobalErrorsType;
 	lastFetched: GlobalLastFetchedType;
 	revalidators: GlobalRevalidatorMapType;
-	revalidateOnFocusEventSetFor: GlobalFocusRevalidationEventSetType;
+	revalidateOnFocusEventSetFor?: GlobalFocusRevalidationEventSetType;
 }
 
 export const FetchProviderContext =
@@ -51,7 +49,6 @@ const FetchProvider = ({ children, value }: FetchProviderProps) => {
 			errors: GlobalErrors(),
 			lastFetched: GlobalLastFetched(),
 			revalidators: GlobalRevalidatorMap(),
-			revalidateOnFocusEventSetFor: GlobalFocusRevalidationEventSet(),
 		}),
 		[value]
 	);

@@ -174,14 +174,14 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 
 	useEffect(() => {
 		if (revalidateOnFocus && isKeyFetchable) {
-			if (!contextToReferTo.revalidateOnFocusEventSetFor.get(key)) {
-				contextToReferTo.revalidateOnFocusEventSetFor.set(key, true);
+			if (!contextToReferTo.revalidateOnFocusEventSetFor?.get(key)) {
+				contextToReferTo.revalidateOnFocusEventSetFor?.set(key, true);
 				const revalidateOnFocusFunc = () => fetchData();
 				window.addEventListener("focus", revalidateOnFocusFunc);
 
 				return () => {
 					window.removeEventListener("focus", revalidateOnFocusFunc);
-					contextToReferTo.revalidateOnFocusEventSetFor.set(key, false);
+					contextToReferTo.revalidateOnFocusEventSetFor?.set(key, false);
 				};
 			}
 		}
