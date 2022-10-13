@@ -113,7 +113,7 @@ const useFetch = (key: FetchKey, options: useFetchOptions = {}) => {
 		return true;
 	};
 
-	const fetchData = async (isFromRevalidate = false) => {
+	const fetchData = (isFromRevalidate = false) => {
 		if (!allowedToFetchData(isFromRevalidate) || !isKeyFetchable) return;
 		setFetching(key, true);
 		fetcher(key)
