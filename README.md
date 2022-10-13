@@ -1,5 +1,7 @@
 # `useFetch` - A Simple hook-based fetcher and caching implementation
 
+Read the blog post about building this library: https://blog.devesh.tech/post/creating-our-own-swr
+
 ### Features
 
 - Reactivity Baked In
