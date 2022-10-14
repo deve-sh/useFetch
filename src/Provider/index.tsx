@@ -1,5 +1,5 @@
 import { createContext, PropsWithChildren, useMemo } from "react";
-import { defaultProviderValue } from "./DefaultGlobalProvider";
+import defaultProviderValue from "./defaultGlobalProvider";
 
 import GlobalCache, { GlobalCacheType } from "../internals/GlobalCache";
 import GlobalFetching, {

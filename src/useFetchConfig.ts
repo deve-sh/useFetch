@@ -1,5 +1,5 @@
-import { useFetchContext } from "./Provider/useFetchContext";
-import globalProvider from "./Provider/DefaultGlobalProvider";
+import useFetchContext from "./Provider/useFetchContext";
+import globalProvider from "./Provider/defaultGlobalProvider";
 
 const useFetchConfig = () => {
 	const contextToReferTo = useFetchContext() || globalProvider;

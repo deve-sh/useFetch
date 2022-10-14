@@ -9,7 +9,7 @@ import GlobalRevalidatorMap from "../internals/GlobalRevalidatorMap";
 import defaultFetcher from "./defaultFetcher";
 
 // In case a FetchProvider has not been added as a wrapper. Pick up the config from this.
-export const defaultProviderValue = {
+const defaultProviderValue = {
 	cache: GlobalCache(),
 	fetching: GlobalFetching(),
 	errors: GlobalErrors(),

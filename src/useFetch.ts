@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useMemo } from "react";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
-import globalProvider from "./Provider/DefaultGlobalProvider";
-import { useFetchContext } from "./Provider/useFetchContext";
+import globalProvider from "./Provider/defaultGlobalProvider";
+import useFetchContext from "./Provider/useFetchContext";
 
 import type FetchKey from "./singleTypes/FetchKey";
 import type Revalidator from "./singleTypes/Revalidator";
